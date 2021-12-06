@@ -10,9 +10,12 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.io.IOException;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
+import com.simba.googlebigquery.jdbc.Driver;
+import com.simba.googlebigquery.jdbc.DataSource;
 
 @Fork(value = 1)
 @BenchmarkMode(Mode.AverageTime)
@@ -69,14 +72,26 @@ public class BQBenchmark {
         }
         blackhole.consume(cnt);
     }
+    @Benchmark
+    //TODO: Complete the logic
+    public void benchmarkSimbaJdbc(Blackhole blackhole) throws SQLException {
+        java.sql.Connection connection = null;
+        DataSource ds = new
+                com.simba.googlebigquery.jdbc.DataSource();
+        ds.setURL(Constants.SIMBA_CONNECTION_URL);
+        connection = ds.getConnection();
+        System.out.println("Connection opened? "+!connection.isClosed());
+        connection.close();
+
+
+    }
 
     public static void main(String[] args) throws SQLException, RunnerException {
         Options opt = new OptionsBuilder()
                 .include(BQBenchmark.class.getSimpleName())
                 .forks(1)
                 .build();
-
         new Runner(opt).run();
+      //  new BQBenchmark().benchmarkSimbaJdbc(null);
     }
-
 }

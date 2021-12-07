@@ -58,16 +58,16 @@ public class BQBenchmark {
     public void benchmarkBQQueryIteration(Blackhole blackhole) throws SQLException, InterruptedException {
         QueryJobConfiguration queryJobConfiguration = QueryJobConfiguration.newBuilder(query).build();
         TableResult results = bigquery.query(queryJobConfiguration); // no way to specify page size
-        // First Page
         int cnt = 0;
-        for (FieldValueList fvl : results.getValues()) {
-            ++cnt;
-        }
-        // remaining pages
-        while (results.hasNextPage()) {
-            results = results.getNextPage();
+        boolean hasPage = true;
+        while (hasPage) {
             for (FieldValueList fvl : results.getValues()) {
                 ++cnt;
+            }
+            if(results.hasNextPage()){
+                results = results.getNextPage();//get next page
+            }else {
+                hasPage=false;
             }
         }
         blackhole.consume(cnt);
